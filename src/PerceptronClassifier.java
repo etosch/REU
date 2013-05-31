@@ -31,14 +31,24 @@ public class PerceptronClassifier {
 		
 	}
 	
-	double expected = dataObj.trainingLabels[dataObj.curTrainingData];
+	Binary expected = dataObj.trainingLabels[dataObj.curTrainingData];
 	//if classification doesn't match expected output, adjust weights and threshold
-	if((sum<threshold && expected==1)|| (sum>threshold && expected==0)){
-		threshold = threshold - alpha*(expected - sum);
-		for(int x=0; x<weights.length; x++){
-			weights[x] = weights[x] + alpha*(expected - sum)*dataObj.trainingData.get(dataObj.curTrainingData, x);
-		}
-	}
+	switch(expected){
+            case CLASS1:
+                if(sum>=threshold){
+                    threshold = threshold - alpha*(expected.ordinal() - sum);
+                    for(int x=0; x<weights.length; x++){
+                            weights[x] = weights[x] + alpha*(expected.ordinal() - sum)*dataObj.trainingData.get(dataObj.curTrainingData, x);
+                    }
+                }
+            case CLASS2:  
+                if(sum<threshold){
+                    threshold = threshold - alpha*(expected.ordinal() - sum);
+                    for(int x=0; x<weights.length; x++){
+                            weights[x] = weights[x] + alpha*(expected.ordinal() - sum)*dataObj.trainingData.get(dataObj.curTrainingData, x);
+                    }
+                }
+        }
 	
 	
 	dataObj.curTrainingData++;
@@ -58,27 +68,43 @@ public class PerceptronClassifier {
     public static void classify(double[] weights, Training dataObj){
 	//use the weights to classify the test data and print out the errors
 	double sum = 0;
-        double expected = dataObj.trainingLabels[dataObj.curTrainingData];
+        double actualClass1 = 0; 
+        double actualClass2 = 0; 
+        double classified1 = 0;
+        double classified2 = 0;
+        
+	for(int y=0; y<dataObj.testingSize(); y++){
+            for(int x =0; x<weights.length; x++){
+                    Binary expected = dataObj.testingLabels[y];
+                    sum+=weights[x]*dataObj.testingData.get(y, x);
+                    System.out.print("Classified as: ");
+                    switch(expected){
+                        case CLASS1:
+                            if(sum<threshold){
+                                System.out.println("Correctly classified as Class 1");
+                                classified1++;
+                            }else{
+                                System.out.println("Incorrectly classified as Class 2");
+                            }
+                            actualClass1++;
+                        case CLASS2:
+                            if(sum<threshold){
+                                System.out.println("Inorrectly classified as Class 1");
+                            }else{
+                                System.out.println("Correctly classified as Class 2");
+                                classified2++;
+                            }
+                            actualClass2++;
+                    }
+                    
+                    System.out.println("Percentage of Class 1 correctly classified: "+classified1/actualClass1);
+                    System.out.println("Percentate of Class 2 correctly classified: "+classified2/actualClass2);
+                    
+
+            }
+        }
 	
-	for(int x =0; x<weights.length; x++){
-		sum+=weights[x]*dataObj.testingData.get(dataObj.curTestingData, x);
-		System.out.print("Classified as: ");
-		if(sum<threshold){
-			if(expected==0)
-				System.out.println("0: correct");
-			else
-				System.out.println("0: incorrect");
-		}else{
-			if(expected==1)
-				System.out.println("1: correct");
-			else
-				System.out.println("1: incorrect");
-		}
-		
-	}
 	
-	
-	dataObj.curTestingData++;
 	return;
     }
 
@@ -116,8 +142,7 @@ abstract class Training<D> {
     // Documentation for the Java Matrix library can be found at http://math.nist.gov/javanumerics/jama/doc/
     
     public int curTrainingData; //index of which training feature vector you're on
-    public int curTestingData; //index of which testing feature you're on
-
+    
     public Vector<Vector<D>> rawData;
     public Matrix trainingData;
     public Matrix testingData;
@@ -191,19 +216,19 @@ class Bools extends Training<Boolean>{
     public void setParameters(){
 	// set the first 8 to be training and the last 2 to be testing
         final int TrainingIterations = 8;
-	this.trainingLabels = new BoolClasses[TrainingIterations]; 
-	this.testingLabels = new BoolClasses[2];
+	this.trainingLabels = new Binary[TrainingIterations]; 
+	this.testingLabels = new Binary[2];
 	int featureVectorSize = this.rawData.get(0).size();
 	double[][] trainingArray = new double[8][featureVectorSize-1]; 
 	double[][] testingArray = new double[2][featureVectorSize-1];
 	for (int i = 0 ; i < this.rawData.size() ; i++){
 	    Vector<Boolean> featVec = this.rawData.get(i);
 	    if (i < 8){
-		trainingLabels[i] = featVec.get(0) ? BoolClasses.FALSE : BoolClasses.TRUE;
+		trainingLabels[i] = featVec.get(0) ? Binary.CLASS1 : Binary.CLASS2;
 		for (int j = 1 ; j < featureVectorSize ; j++)
 		    trainingArray[i][j-1] = featVec.get(j) ? 1.0 : 0.0;
 	    } else {
-		testingLabels[i-8] = featVec.get(0) ? BoolClasses.FALSE : BoolClasses.TRUE;
+		testingLabels[i-8] = featVec.get(0) ? Binary.CLASS1 : Binary.CLASS2;
 		for (int j = 1 ; j < featureVectorSize ; j++)
 		    testingArray[i-8][j-1] = featVec.get(j) ? 1.0 : 0.0;
 	    }
