@@ -24,6 +24,7 @@ public class PerceptronClassifier {
 	// you will need some way of tracking where you are right now in the 
 	// training data. You can keep a pointer to the current record somewhere
 	// or decide to keep the training instances in a stack, rather than a Matrix
+        int sum=0;
 	
 	for(int x =0; x<weights.length; x++){
 		sum+=weights[x]*dataObj.trainingData.get(dataObj.curTrainingData, x);
@@ -40,26 +41,29 @@ public class PerceptronClassifier {
 	}
 	
 	
-	curTrainingData++;
+	dataObj.curTrainingData++;
 	return;
     }
 
     public static boolean stoppingCondition(double[] weights, Training dataObj){ //unfinished
 	// stop if the error is sufficiently small, if we've run out of training data, 
 	// or if we have been running for too long.
-	if(dataObj.curData>dataObj.trainingData.length){
+	if(dataObj.curTrainingData>dataObj.trainingData.length){
 		return true;
-	}
+	}else{
+            return false;
+        }
     }
 
     public static void classify(double[] weights, Training dataObj){
 	//use the weights to classify the test data and print out the errors
 	double sum = 0;
+        double expected = dataObj.trainingLabels[dataObj.curTrainingData];
 	
 	for(int x =0; x<weights.length; x++){
 		sum+=weights[x]*dataObj.testingData.get(dataObj.curTestingData, x);
 		System.out.print("Classified as: ");
-		if((sum<threshold){
+		if(sum<threshold){
 			if(expected==0)
 				System.out.println("0: correct");
 			else
@@ -74,7 +78,7 @@ public class PerceptronClassifier {
 	}
 	
 	
-	curTestingData++;
+	dataObj.curTestingData++;
 	return;
     }
 
@@ -102,7 +106,7 @@ public class PerceptronClassifier {
     }
 }
 
-abstract class Training<D, C> {
+abstract class Training<D> {
     // Training is an abstract superclass that supplies functionality for all 
     // inputs. The generic type D represents the type of the data. All operations on 
     // training data that are parameterized by type occur within this class; the 
@@ -111,14 +115,14 @@ abstract class Training<D, C> {
 
     // Documentation for the Java Matrix library can be found at http://math.nist.gov/javanumerics/jama/doc/
     
-    public static int curTrainingData; //index of which training feature vector you're on
-    public static int curTestingData; //index of which testing feature you're on
+    public int curTrainingData; //index of which training feature vector you're on
+    public int curTestingData; //index of which testing feature you're on
 
     public Vector<Vector<D>> rawData;
     public Matrix trainingData;
     public Matrix testingData;
-    public C[] trainingLabels;
-    public C[] testingLabels;
+    public Binary[] trainingLabels;
+    public Binary[] testingLabels;
 
     // this should set rawData. You can format the raw data file any way you want, but I would
     // suggest representing it as a csv with either the first or last entry set as the label.
@@ -158,9 +162,9 @@ class TypeNotFoundException extends Exception {
 
 }
 
-enum BoolClasses { TRUE, FALSE, MAYBE }
+enum Binary { CLASS1, CLASS2 }
 
-class Bools extends Training<Boolean, BoolClasses>{
+class Bools extends Training<Boolean>{
 
     public Bools(String filename) throws Exception {
 	this.rawData = loadData(filename);
