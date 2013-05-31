@@ -6,10 +6,15 @@ import java.io.*;
 public class PerceptronClassifier {
     
     public static double alpha = 0.01;
+    
 
     public static double[] initializeWeights(int size){
-	// fill this out and return an initialized weight vector
-	return new double[size];
+	double[] weights = new double[size];
+	
+	for(int x=0; x<size; x++){
+		weights[x]= Math.random()/5; //initialize weights to small random value
+	}
+	return weights;
     }
 
     public static void iterate(double[] weights, Training dataObj){
@@ -17,17 +22,26 @@ public class PerceptronClassifier {
 	// you will need some way of tracking where you are right now in the 
 	// training data. You can keep a pointer to the current record somewhere
 	// or decide to keep the training instances in a stack, rather than a Matrix
+	
 	return;
     }
 
-    public static boolean stoppingCondition(double[] weights, Training dataObj){
+    public static boolean stoppingCondition(double[] weights, Training dataObj){ //unfinished
 	// stop if the error is sufficiently small, if we've run out of training data, 
 	// or if we have been running for too long.
-	return true;
+	if(dataObj.curData>dataObj.trainingData.length){
+		return true;
+	}
     }
 
     public static void classify(double[] weights, Training dataObj){
 	//use the weights to classify the test data and print out the errors
+	double sum = 0;
+	
+	for(int x =0; x<weights.length; x++){
+		sum+=weights[x]*dataObj.testingData.get(dataObj.curTestingData, x);
+	}
+	
 	return;
     }
 
@@ -63,6 +77,9 @@ abstract class Training<D, C> {
     // You will need to decide where/how to implement feature functions.
 
     // Documentation for the Java Matrix library can be found at http://math.nist.gov/javanumerics/jama/doc/
+    
+    public static int curTrainingData; //index of which training feature vector you're on
+    public static int curTestingData; //index of which testing feature you're on
 
     public Vector<Vector<D>> rawData;
     public Matrix trainingData;
