@@ -6,6 +6,7 @@ import java.io.*;
 public class PerceptronClassifier {
     
     public static double alpha = 0.01;
+    public static double threshold = 0.5;
     
     
 
@@ -24,6 +25,22 @@ public class PerceptronClassifier {
 	// training data. You can keep a pointer to the current record somewhere
 	// or decide to keep the training instances in a stack, rather than a Matrix
 	
+	for(int x =0; x<weights.length; x++){
+		sum+=weights[x]*dataObj.trainingData.get(dataObj.curTrainingData, x);
+		
+	}
+	
+	double expected = dataObj.trainingLabels[dataObj.curTrainingData];
+	//if classification doesn't match expected output, adjust weights and threshold
+	if((sum<threshold && expected==1)|| (sum>threshold && expected==0)){
+		threshold = threshold - alpha*(expected - sum);
+		for(int x=0; x<weights.length; x++){
+			weights[x] = weights[x] + alpha*(expected - sum)*dataObj.trainingData.get(dataObj.curTrainingData, x);
+		}
+	}
+	
+	
+	curTrainingData++;
 	return;
     }
 
@@ -41,8 +58,11 @@ public class PerceptronClassifier {
 	
 	for(int x =0; x<weights.length; x++){
 		sum+=weights[x]*dataObj.testingData.get(dataObj.curTestingData, x);
+		
 	}
 	
+	
+	curTestingData++;
 	return;
     }
 
