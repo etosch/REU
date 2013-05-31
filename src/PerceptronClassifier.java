@@ -7,6 +7,7 @@ public class PerceptronClassifier {
     
     public static double alpha = 0.01;
     
+    
 
     public static double[] initializeWeights(int size){
 	double[] weights = new double[size];
