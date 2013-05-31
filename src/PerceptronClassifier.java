@@ -58,6 +58,18 @@ public class PerceptronClassifier {
 	
 	for(int x =0; x<weights.length; x++){
 		sum+=weights[x]*dataObj.testingData.get(dataObj.curTestingData, x);
+		System.out.print("Classified as: ");
+		if((sum<threshold){
+			if(expected==0)
+				System.out.println("0: correct");
+			else
+				System.out.println("0: incorrect");
+		}else{
+			if(expected==1)
+				System.out.println("1: correct");
+			else
+				System.out.println("1: incorrect");
+		}
 		
 	}
 	
