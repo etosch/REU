@@ -190,6 +190,7 @@ class Bools extends Training<Boolean>{
 
     public void setParameters(){
 	// set the first 8 to be training and the last 2 to be testing
+        final int TrainingIterations = 8;
 	this.trainingLabels = new BoolClasses[8]; 
 	this.testingLabels = new BoolClasses[2];
 	int featureVectorSize = this.rawData.get(0).size();
